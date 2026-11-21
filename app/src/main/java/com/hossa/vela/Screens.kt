@@ -445,8 +445,8 @@ fun BotsScreen() {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(3, 6, 12).forEach { m -> Chip("$m meses", months == m) { months = m; result = null } }
         }
+        Text("Cada vela dura:", color = C.Dim, fontSize = 13.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Velas de", color = C.Dim, fontSize = 13.sp)
             listOf("1h" to "1 hora", "4h" to "4 horas", "1d" to "1 día").forEach { (k, l) -> Chip(l, iv == k, C.Blue) { iv = k; result = null } }
         }
 
@@ -534,8 +534,9 @@ fun BotsScreen() {
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text("${b.cfg.title} · ${b.symbol}", color = C.Text, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text("Desde ${date(b.created)} · velas de ${b.interval}" + if (!b.active) " · pausado" else "",
-                                color = C.Dim, fontSize = 12.sp)
+                            Text("Desde ${date(b.created)}" + if (!b.active) " · pausado" else "",
+                                color = C.Dim, fontSize = 12.sp, maxLines = 1)
+                            Text("Velas de ${b.interval.replace("h", " h").replace("1d", "1 día")}", color = C.Faint, fontSize = 12.sp, maxLines = 1)
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text(Fmt.money(value), color = C.Text, fontFamily = Mono, fontSize = 15.sp, fontWeight = FontWeight.Bold)
@@ -544,7 +545,11 @@ fun BotsScreen() {
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(when {
-                        b.trades.isEmpty() -> "Aún no ha operado: está esperando su señal."
+                        b.trades.isEmpty() -> when (b.cfg.type) {
+                            "rsi" -> "Aún no ha operado: espera a que el RSI baje de ${b.cfg.p1.toInt()} para comprar. Puede tardar días."
+                            "ma" -> "Aún no ha operado: espera a que las medias se crucen hacia arriba. Puede tardar días."
+                            else -> "Aún no ha operado: actúa cuando se cierre la próxima vela."
+                        }
                         else -> "${b.trades.size} operaciones · última: " + b.trades.last().let {
                             (if (it.buy) "compró" else "vendió") + " a ${Fmt.usd(it.price)} el ${date(it.time)}"
                         }

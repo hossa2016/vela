@@ -79,7 +79,7 @@ fun Chip(text: String, selected: Boolean, accent: Color = C.Green, onClick: () -
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
-        Text(text, color = if (selected) accent else C.Dim, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(text, color = if (selected) accent else C.Dim, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
     }
 }
 
